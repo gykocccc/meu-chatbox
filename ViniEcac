@@ -1,0 +1,61 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import time
+import tkinter as tk
+from tkinter import messagebox
+
+# Função para exibir a janela com a mensagem
+def mostrar_janela_aviso():
+    root = tk.Tk()
+    root.withdraw()  # Esconde a janela principal
+    messagebox.showinfo("Aviso", "⚠️ Resolva o CAPTCHA manualmente e pressione Enter para continuar...")
+    root.destroy()  # Fecha a janela após a interação
+
+# Configuração do Chrome
+chrome_options = Options()
+chrome_options.add_argument("--ignore-certificate-errors")  
+chrome_options.add_argument("--allow-running-insecure-content")
+chrome_options.add_argument("--disable-popup-blocking")  
+chrome_options.add_argument("--start-maximized")  
+chrome_options.add_argument("--no-sandbox")  
+
+# Inicializa o WebDriver
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+# Abre o e-CAC
+driver.get("https://cav.receita.fazenda.gov.br/ecac/")
+
+# Tempo para garantir que a página carregue
+time.sleep(5)
+
+# Clica no botão "Entrar com gov.br"
+try:
+    botao_entrar = driver.find_element(By.XPATH, "//input[@alt='Acesso Gov BR']")
+    botao_entrar.click()
+    print("Botão 'Entrar com gov.br' clicado com sucesso!")
+except Exception as e:
+    print("Erro ao clicar no botão:", e)
+
+# Espera carregar a página de login
+time.sleep(5)
+
+# Clica no botão "Seu Certificado Digital"
+try:
+    botao_certificado = driver.find_element(By.ID, "login-certificate")
+    botao_certificado.click()
+    print("Botão 'Seu Certificado Digital' clicado com sucesso!")
+except Exception as e:
+    print("Erro ao clicar no botão:", e)
+
+# Exibe a janela de aviso para resolver o CAPTCHA manualmente
+mostrar_janela_aviso()
+
+# Continua após o CAPTCHA
+print("CAPTCHA resolvido! Continuando o processo...")
+
+# Mantém o navegador aberto
+input("Pressione Enter para fechar o navegador...")
+driver.quit()
